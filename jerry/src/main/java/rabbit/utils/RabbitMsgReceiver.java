@@ -23,6 +23,7 @@ public class RabbitMsgReceiver {
 	private ConnectionFactory cf; 
 	private Connection conn;
 	private boolean autoAck = false; 
+	private boolean preFetch = true; 
 	
 	public RabbitMsgReceiver(String url){
 		this.URL = url; 
@@ -50,6 +51,10 @@ public class RabbitMsgReceiver {
 			channel.exchangeDeclare(EXCHANAGE_NAME, "fanout",true); 
 			channel.queueDeclare(QUEUE_NAME, true, false, false, null); 
 			channel.queueBind(QUEUE_NAME, EXCHANAGE_NAME, ""); 
+			
+			if(preFetch){
+				channel.basicQos(10);
+			}
 			
 			QueueingConsumer consumer = new QueueingConsumer(channel); 
 			channel.basicConsume(QUEUE_NAME, autoAck,consumer); 
